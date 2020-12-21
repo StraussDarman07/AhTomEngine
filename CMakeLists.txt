@@ -43,3 +43,7 @@ target_link_libraries(${PROJECT_NAME} ${GLM_LIBRARY_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            )
+
+add_custom_command(TARGET AhTomEngine PRE_BUILD
+                            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                            ${CMAKE_SOURCE_DIR}/shaders/ $<TARGET_FILE_DIR:AhTomEngine>/shaders/)

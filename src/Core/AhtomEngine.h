@@ -46,13 +46,35 @@ namespace Core
 
 		VkSwapchainKHR swapChain;
 
+		VkRenderPass renderPass;
+		
+		VkPipelineLayout pipelineLayout;
+
 		std::vector<VkImage> swapChainImages;
 
 		VkFormat swapChainImageFormat;
 
 		VkExtent2D swapChainExtent;
 
+		VkPipeline graphicsPipeline;
+
+		VkCommandPool commandPool;
+
 		std::vector<VkImageView> swapChainImageViews;
+
+		std::vector<VkFramebuffer> swapChainFramebuffers;
+
+		std::vector<VkCommandBuffer> commandBuffers;
+
+		const int MAX_FRAMES_IN_FLIGHT = 2;
+		
+		std::vector<VkSemaphore> imageAvailableSemaphores;
+		std::vector<VkSemaphore> renderFinishedSemaphores;
+		std::vector<VkFence> inFlightFences;
+		std::vector<VkFence> imagesInFlight;
+
+		size_t currentFrame = 0;
+
 
 		void initWindow();
 
@@ -70,9 +92,21 @@ namespace Core
 		
 		void createGraphicsPipeline();
 
+		void createRenderPass();
+
+		void createFramebuffers();
+
+		void createCommandPool();
+		
+		void createCommandBuffers();
+
+		void createSyncObjects();
+
 		std::vector<const char*> getRequiredExtension();
 
 		void mainLoop();
+
+		void drawFrame();
 
 		void pickPhysicalDevice();
 
