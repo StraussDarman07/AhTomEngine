@@ -20,7 +20,7 @@ file(GLOB_RECURSE SOURCES
 set(ALL_SOURCE_FILES ${SOURCES})
 
 configure_file(main.h.in main.h)
-add_executable(${PROJECT_NAME} "main.cpp" ${ALL_SOURCE_FILES} "src/Core/Misc/VulkanDebug.h" "src/Core/Misc/VulkanDevice.h")
+add_executable(${PROJECT_NAME} "main.cpp" ${ALL_SOURCE_FILES})
 
 
 # GLFW3 Include

@@ -12,12 +12,19 @@
 #include "Misc/VulkanDevice.h"
 #include "Misc/FileIO.h"
 #include "Shader/ShaderUtils.h"
+#include "Types/Vertex.h"
 
 #define GLFW_INCLUDE_VULKAN
 
 #define println(x) std::cout << x << std::endl
 
 #define throwEx(x) throw std::runtime_error(x)
+
+const std::vector<Vertex> vertices = {
+	{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+	{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+	{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+};
 
 Core::AhTomEngine::AhTomEngine(int versionMajor, int versionMinor, int versionPatch)
 {
@@ -35,18 +42,22 @@ void Core::AhTomEngine::run()
 	cleanup();
 }
 
+static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+	auto* app = static_cast<Core::AhTomEngine*>(glfwGetWindowUserPointer(window));
+	app->framebufferResized = true;
+}
+
 void Core::AhTomEngine::initWindow()
 {
 	glfwInit();
 
-	//Disable creating OpenGL Context
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	//Disalbe resizing of the Window
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	std::string windowName = applicationName + " v" + std::to_string(versionMajor) + "." + std::to_string(versionMinor);
 
 	window = glfwCreateWindow(Device::WIDTH, Device::HEIGHT, windowName.c_str(), nullptr, nullptr);
+	glfwSetWindowUserPointer(window, this);
+	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
 void Core::AhTomEngine::initVulkan()
@@ -62,6 +73,7 @@ void Core::AhTomEngine::initVulkan()
 	createGraphicsPipeline();
 	createFramebuffers();
 	createCommandPool();
+	createVertexBuffer();
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -380,12 +392,15 @@ void Core::AhTomEngine::createGraphicsPipeline()
 
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
+	auto bindingDescription = Vertex::getBindingDescription();
+	auto attributeDescriptions = Vertex::getAttributeDescriptions();
+	
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -611,7 +626,11 @@ void Core::AhTomEngine::createCommandBuffers()
 
 		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-		vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+		VkBuffer vertexBuffers[] = { vertexBuffer };
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+		
+		vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 
 		vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -619,9 +638,40 @@ void Core::AhTomEngine::createCommandBuffers()
 			throw std::runtime_error("failed to record command buffer!");
 		}
 	}
-
-	
 }
+
+void Core::AhTomEngine::createVertexBuffer()
+{
+	VkBufferCreateInfo bufferInfo{};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size = sizeof vertices[0] * vertices.size();
+	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	if (vkCreateBuffer(device, &bufferInfo, nullptr, &vertexBuffer) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create vertex buffer!");
+	}
+
+	VkMemoryRequirements memRequirements;
+	vkGetBufferMemoryRequirements(device, vertexBuffer, &memRequirements);
+
+	VkMemoryAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = Device::findMemoryType(physicalDevice, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+	if (vkAllocateMemory(device, &allocInfo, nullptr, &vertexBufferMemory) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate vertex buffer memory!");
+	}
+
+	vkBindBufferMemory(device, vertexBuffer, vertexBufferMemory, 0);
+
+	void* data;
+	vkMapMemory(device, vertexBufferMemory, 0, bufferInfo.size, 0, &data);
+	memcpy(data, vertices.data(), static_cast<size_t>(bufferInfo.size));
+	vkUnmapMemory(device, vertexBufferMemory);
+}
+
 
 void Core::AhTomEngine::createSyncObjects()
 {
@@ -647,6 +697,48 @@ void Core::AhTomEngine::createSyncObjects()
 	}
 }
 
+void Core::AhTomEngine::cleanupSwapChain()
+{
+	for (size_t i = 0; i < swapChainFramebuffers.size(); i++) {
+		vkDestroyFramebuffer(device, swapChainFramebuffers[i], nullptr);
+	}
+
+	vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+
+	vkDestroyPipeline(device, graphicsPipeline, nullptr);
+	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+	vkDestroyRenderPass(device, renderPass, nullptr);
+
+	for (auto& swapChainImageView : swapChainImageViews)
+	{
+		vkDestroyImageView(device, swapChainImageView, nullptr);
+	}
+
+	vkDestroySwapchainKHR(device, swapChain, nullptr);
+}
+
+void Core::AhTomEngine::recreateSwapChain()
+{
+	int width = 0, height = 0;
+	glfwGetFramebufferSize(window, &width, &height);
+	while (width == 0 || height == 0) {
+		glfwGetFramebufferSize(window, &width, &height);
+		glfwWaitEvents();
+	}
+	
+	vkDeviceWaitIdle(device);
+
+	cleanupSwapChain();
+
+	createSwapChain();
+	createImageViews();
+	createRenderPass();
+	createGraphicsPipeline();
+	createFramebuffers();
+	createCommandBuffers();
+}
+
+
 
 void Core::AhTomEngine::mainLoop()
 {
@@ -664,8 +756,18 @@ void Core::AhTomEngine::drawFrame()
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
 	uint32_t imageIndex;
-	vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
+	if(result == VK_ERROR_OUT_OF_DATE_KHR)
+	{
+		recreateSwapChain();
+		return;
+	}
+	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+	{
+		throw std::runtime_error("failed to acquire swap chain image!");
+	}
+	
 	if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
 		vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
 	}
@@ -705,7 +807,17 @@ void Core::AhTomEngine::drawFrame()
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr; // Optional
 
-	vkQueuePresentKHR(presentQueue, &presentInfo);
+	result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) 
+	{
+		framebufferResized = false;
+		recreateSwapChain();
+	}
+	else if (result != VK_SUCCESS) 
+	{
+		throw std::runtime_error("failed to present swap chain image!");
+	}
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
@@ -713,6 +825,11 @@ void Core::AhTomEngine::drawFrame()
 
 void Core::AhTomEngine::cleanup()
 {
+	cleanupSwapChain();
+
+	vkDestroyBuffer(device, vertexBuffer, nullptr);
+	vkFreeMemory(device, vertexBufferMemory, nullptr);
+	
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
 		vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
@@ -720,27 +837,7 @@ void Core::AhTomEngine::cleanup()
 	}
 	
 	vkDestroyCommandPool(device, commandPool, nullptr);
-	
-	for (auto framebuffer : swapChainFramebuffers) 
-	{
-		vkDestroyFramebuffer(device, framebuffer, nullptr);
-	}
-	
-	vkDestroyPipeline(device, graphicsPipeline, nullptr);
-	
-	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-	
-	vkDestroyRenderPass(device, renderPass, nullptr);
-	
-	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-	
-	vkDestroySwapchainKHR(device, swapChain, nullptr);
 
-	for (auto imageView : swapChainImageViews) 
-	{
-		vkDestroyImageView(device, imageView, nullptr);
-	}
-	
 	vkDestroyDevice(device, nullptr);
 	
 	if(Debug::enableValidationLayers)

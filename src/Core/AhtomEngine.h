@@ -13,6 +13,7 @@ namespace Core
 	class AhTomEngine {
 
 	public:
+		bool framebufferResized = false;
 		
 		AhTomEngine(int versionMajor, int versionMinor, int versionPatch);
 		
@@ -60,6 +61,10 @@ namespace Core
 
 		VkCommandPool commandPool;
 
+		VkBuffer vertexBuffer;
+
+		VkDeviceMemory vertexBufferMemory;
+
 		std::vector<VkImageView> swapChainImageViews;
 
 		std::vector<VkFramebuffer> swapChainFramebuffers;
@@ -98,9 +103,15 @@ namespace Core
 
 		void createCommandPool();
 		
+		void createVertexBuffer();
+		
 		void createCommandBuffers();
 
 		void createSyncObjects();
+
+		void recreateSwapChain();
+		
+		void cleanupSwapChain();
 
 		std::vector<const char*> getRequiredExtension();
 
