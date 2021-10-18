@@ -1,5 +1,4 @@
-#ifndef AHTOMENGINE_H
-#define AHTOMENGINE_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -124,4 +123,3 @@ namespace Core
 		void cleanup();
 	};
 }
-#endif // AHTOMENGINE_H
