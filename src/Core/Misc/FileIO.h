@@ -9,7 +9,7 @@ namespace Core::FileIO
     	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
         if (!file.is_open()) {
-            throw std::runtime_error("failed to open file!");
+            throw std::runtime_error("failed to open file: " + filename);
         }
 
         const size_t fileSize = static_cast<size_t>(file.tellg());
