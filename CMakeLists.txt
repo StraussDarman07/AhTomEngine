@@ -24,7 +24,7 @@ add_executable(${PROJECT_NAME} "main.cpp" ${ALL_SOURCE_FILES})
 
 
 # GLFW3 Include
-set(GLFW3 "${PROJECT_SOURCE_DIR}/lib/glfw-3.3.2")
+set(GLFW3 "${PROJECT_SOURCE_DIR}/submodules/glfw")
 add_subdirectory("${GLFW3}")
 target_link_libraries(${PROJECT_NAME} glfw ${GLFW_LIBRARIES})
 
@@ -34,7 +34,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan)
 
 # GLM Include
-set(GLM_DIR "${PROJECT_SOURCE_DIR}/lib/glm/cmake/glm")
+set(GLM_DIR "${PROJECT_SOURCE_DIR}/submodules/glm/cmake/glm")
 find_package(GLM REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${GLM_LIBRARY_DIRS})
