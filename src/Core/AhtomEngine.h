@@ -47,6 +47,8 @@ namespace Core
 		VkSwapchainKHR swapChain;
 
 		VkRenderPass renderPass;
+
+		VkDescriptorSetLayout descriptorSetLayout;
 		
 		VkPipelineLayout pipelineLayout;
 
@@ -63,12 +65,24 @@ namespace Core
 		VkBuffer vertexBuffer;
 
 		VkDeviceMemory vertexBufferMemory;
+		
+		VkBuffer indexBuffer;
+
+		VkDeviceMemory indexBufferMemory;
+		
+		VkDescriptorPool descriptorPool;
+
+		std::vector<VkBuffer> uniformBuffers;
+		
+		std::vector<VkDeviceMemory> uniformBuffersMemory;
 
 		std::vector<VkImageView> swapChainImageViews;
 
 		std::vector<VkFramebuffer> swapChainFramebuffers;
 
 		std::vector<VkCommandBuffer> commandBuffers;
+		
+		std::vector<VkDescriptorSet> descriptorSets;
 
 		const int MAX_FRAMES_IN_FLIGHT = 2;
 		
@@ -93,6 +107,8 @@ namespace Core
 		void createSwapChain();
 		
 		void createImageViews();
+
+		void createDescriptorSetLayout();
 		
 		void createGraphicsPipeline();
 
@@ -103,6 +119,12 @@ namespace Core
 		void createCommandPool();
 		
 		void createVertexBuffer();
+
+		void createUniformBuffers();
+
+		void createDescriptorPool();
+
+		void createIndexBuffer();
 		
 		void createCommandBuffers();
 
@@ -111,6 +133,10 @@ namespace Core
 		void recreateSwapChain();
 		
 		void cleanupSwapChain();
+
+		void updateUniformBuffer(uint32_t currentImage);
+
+		void createDescriptorSets();
 
 		std::vector<const char*> getRequiredExtension();
 
