@@ -39,6 +39,9 @@ find_package(GLM REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${GLM_LIBRARY_DIRS})
 
+set(STB "${PROJECT_SOURCE_DIR}/submodules/stb")
+include_directories("${STB}")
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_BINARY_DIR}"
@@ -47,3 +50,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 add_custom_command(TARGET AhTomEngine PRE_BUILD
                             COMMAND ${CMAKE_COMMAND} -E copy_directory
                             ${CMAKE_SOURCE_DIR}/shaders/ $<TARGET_FILE_DIR:AhTomEngine>/shaders/)
+
+                            add_custom_command(TARGET AhTomEngine PRE_BUILD
+                            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                            ${CMAKE_SOURCE_DIR}/textures/ $<TARGET_FILE_DIR:AhTomEngine>/textures/)

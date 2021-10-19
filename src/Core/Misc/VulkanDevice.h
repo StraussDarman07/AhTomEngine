@@ -1,6 +1,8 @@
+#pragma once
+
 #include <algorithm>
 #include <optional>
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 
 namespace Core::Device
 {
@@ -177,8 +179,11 @@ namespace Core::Device
 			SwapChainSupportDetails swap_chain_support = querySwapChainSupport(device, surface);
 			swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
 		}
+
+		VkPhysicalDeviceFeatures supportedFeatures;
+		vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
 		
-		return indices.isComplete() && extension_supported && swap_chain_adequate;
+		return indices.isComplete() && extension_supported && swap_chain_adequate && supportedFeatures.samplerAnisotropy;
 	}
 
 	inline int rateDeviceSuitability(VkPhysicalDevice device)

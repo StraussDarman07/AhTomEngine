@@ -72,6 +72,14 @@ namespace Core
 		
 		VkDescriptorPool descriptorPool;
 
+		VkImage textureImage;
+		
+		VkDeviceMemory textureImageMemory;
+
+		VkImageView textureImageView;
+		
+		VkSampler textureSampler;
+
 		std::vector<VkBuffer> uniformBuffers;
 		
 		std::vector<VkDeviceMemory> uniformBuffersMemory;
@@ -137,6 +145,12 @@ namespace Core
 		void updateUniformBuffer(uint32_t currentImage);
 
 		void createDescriptorSets();
+
+		void createTextureImage();
+
+		void createTextureImageView();
+
+		void createTextureSampler();
 
 		std::vector<const char*> getRequiredExtension();
 
