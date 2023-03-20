@@ -34,8 +34,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan)
 
 # GLM Include
-set(GLM_DIR "${PROJECT_SOURCE_DIR}/submodules/glm/cmake/glm")
-find_package(GLM REQUIRED)
+set(glm_DIR "${PROJECT_SOURCE_DIR}/submodules/glm/cmake/glm")
+find_package(glm REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${GLM_LIBRARY_DIRS})
 

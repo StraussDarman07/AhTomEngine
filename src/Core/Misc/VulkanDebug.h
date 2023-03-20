@@ -1,5 +1,7 @@
 #include <iostream>
 #include <ostream>
+#include <vector>
+#include <cstring>
 #include <vulkan/vulkan.h>
 
 namespace Core::Debug
