@@ -47,10 +47,21 @@ target_include_directories(${PROJECT_NAME} PUBLIC
                            "${PROJECT_BINARY_DIR}"
                            )
 
+
+if (WIN32)                          
+    add_custom_command(TARGET AhTomEngine PRE_BUILD
+                                COMMAND cmd /c ${CMAKE_SOURCE_DIR}/compile_shader.bat
+                                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+else()
+    add_custom_command(TARGET AhTomEngine PRE_BUILD
+                                COMMAND ${CMAKE_SOURCE_DIR}/compile_shader.sh
+                                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+endif()
+
 add_custom_command(TARGET AhTomEngine PRE_BUILD
                             COMMAND ${CMAKE_COMMAND} -E copy_directory
                             ${CMAKE_SOURCE_DIR}/shaders/ $<TARGET_FILE_DIR:AhTomEngine>/shaders/)
 
-                            add_custom_command(TARGET AhTomEngine PRE_BUILD
+add_custom_command(TARGET AhTomEngine PRE_BUILD
                             COMMAND ${CMAKE_COMMAND} -E copy_directory
                             ${CMAKE_SOURCE_DIR}/textures/ $<TARGET_FILE_DIR:AhTomEngine>/textures/)
