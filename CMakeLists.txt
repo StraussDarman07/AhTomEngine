@@ -23,7 +23,7 @@ set(ENGINE_MODULE_FILES
     "src/Core/Types/AhtomWindow.ixx"
     "src/Core/Misc/VulkanDebug.ixx"
     "src/Core/Misc/VulkanHelper.ixx"
-    "src/Core/Misc/VulkanDevice.ixx" "src/Core/Types/AhtomSwapChain.ixx")
+    "src/Core/Misc/VulkanDevice.ixx" "src/Core/Types/AhtomSwapChain.ixx" "src/Core/Misc/ImageUtils.ixx" "src/Core/Types/AhtomRenderPass.ixx" "src/Core/Types/AhtomDescriptor.ixx" "src/Core/Types/AhtomGraphicsPipeline.ixx" "src/Core/Misc/FileIO.ixx" "src/Core/Shader/ShaderUtils.ixx" "src/Core/Types/Vertex.ixx")
 
 message("Modules: ${ENGINE_MODULE_FILES}")
 configure_file(main.h.in main.h)

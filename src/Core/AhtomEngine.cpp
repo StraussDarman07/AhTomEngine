@@ -84,13 +84,12 @@ void Core::AhTomEngine::initVulkan()
 	Debug::setupDebugMessenger(instance, &debugMessenger);
 	createSurface();
 	pickPhysicalDevice();
-
 	createLogicalDevice();
-
 	createSwapChain();
 	createImageViews();
 	createRenderPass();
 	createDescriptorSetLayout();
+
 	createGraphicsPipeline();
 	createFramebuffers();
 	createCommandPool();

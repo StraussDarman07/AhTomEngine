@@ -1,12 +1,14 @@
-#pragma once
+module;
 
 #include <fstream>
 #include <vector>
 #include <filesystem>
 
-namespace Core::FileIO
+export module FileIO;
+
+namespace FileIO
 {
-    static std::vector<char> readFile(const std::string& filename)
+    export std::vector<char> readFile(const std::string& filename)
     {
         std::ifstream file(filename, std::ios::ate | std::ios::binary);
 

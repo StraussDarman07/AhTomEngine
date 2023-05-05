@@ -8,18 +8,25 @@ module;
 export module AhtomSwapChain;
 
 import VulkanDevice;
+import ImageUtils;
 import AhtomDevice;
 
 export class AhtomSwapChain
 {
 public:
 	AhtomSwapChain(AhtomDevice device, VkSurfaceKHR surface);
+	void createImageViews(AhtomDevice device);
+
+	VkFormat getSwapChainImageFormat() const;
+	VkExtent2D getSwapChainExtent() const;
 
 private:
 	VkSwapchainKHR swapChain;
-	std::vector<VkImage> swapChainImages;
-	VkFormat swapChainImageFormat;
-	VkExtent2D swapChainExtent;
+	std::vector<VkImage> mSwapChainImages;
+	std::vector<VkImageView> mSwapChainImageViews;
+	VkFormat mSwapChainImageFormat;
+	VkExtent2D mSwapChainExtent;
+
 };
 
 AhtomSwapChain::AhtomSwapChain(AhtomDevice device, VkSurfaceKHR surface)
@@ -79,9 +86,29 @@ AhtomSwapChain::AhtomSwapChain(AhtomDevice device, VkSurfaceKHR surface)
 	}
 
 	vkGetSwapchainImagesKHR(device.getLogicalDevice(), swapChain, &image_count, nullptr);
-	swapChainImages.resize(image_count);
-	vkGetSwapchainImagesKHR(device.getLogicalDevice(), swapChain, &image_count, swapChainImages.data());
+	mSwapChainImages.resize(image_count);
+	vkGetSwapchainImagesKHR(device.getLogicalDevice(), swapChain, &image_count, mSwapChainImages.data());
 
-	swapChainImageFormat = surface_format.format;
-	swapChainExtent = extent;
+	mSwapChainImageFormat = surface_format.format;
+	mSwapChainExtent = extent;
 }
+
+void AhtomSwapChain::createImageViews(AhtomDevice device)
+{
+	mSwapChainImageViews.resize(mSwapChainImages.size());
+
+	for (uint32_t i = 0; i < mSwapChainImages.size(); i++) {
+		mSwapChainImageViews[i] = ImageUtils::createImageView(device.getLogicalDevice(), mSwapChainImages[i], mSwapChainImageFormat);
+	}
+}
+
+VkFormat AhtomSwapChain::getSwapChainImageFormat() const
+{
+	return mSwapChainImageFormat;
+}
+
+VkExtent2D AhtomSwapChain::getSwapChainExtent() const
+{
+	return mSwapChainExtent;
+}
+

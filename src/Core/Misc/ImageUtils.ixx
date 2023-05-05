@@ -1,13 +1,15 @@
-#pragma once
+module;
 
+#include <vulkan/vulkan.h>
 #include <stdexcept>
-#include <vulkan/vulkan_core.h>
 
-#include "VulkanDevice.h"
+export module ImageUtils;
 
-namespace Core::ImageUtils
+import VulkanDevice;
+
+namespace ImageUtils
 {
-	inline void createImage(VkDevice device, VkPhysicalDevice physicalDevice, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
+	export void createImage(VkDevice device, VkPhysicalDevice physicalDevice, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
 		VkImageCreateInfo imageInfo{};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -42,7 +44,7 @@ namespace Core::ImageUtils
 		vkBindImageMemory(device, image, imageMemory, 0);
 	}
 
-	inline VkImageView createImageView(VkDevice device, VkImage image, VkFormat format)
+	export VkImageView createImageView(VkDevice device, VkImage image, VkFormat format)
 	{
 		VkImageViewCreateInfo viewInfo{};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;

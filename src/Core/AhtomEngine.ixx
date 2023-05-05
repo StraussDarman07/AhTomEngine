@@ -7,7 +7,9 @@ import AhtomWindow;
 import AhtomInstance;
 import AhtomDevice;
 import AhtomSwapChain;
-import VulkanDebug;
+import AhtomRenderPass;
+import AhtomDescriptor;
+import AhtomGraphicsPipeline;
 
 constexpr char APP_NAME[] = "AhTomEngine";
 
@@ -26,6 +28,9 @@ private:
 	AhtomWindow* mWindow = nullptr;
 	AhtomDevice* mAhtomDevice = nullptr;
 	AhtomSwapChain* mSwapChain = nullptr;
+	AhtomRenderPass* mRenderPass = nullptr;
+	AhtomDescriptor* mDescriptor = nullptr;
+	AhtomGraphicsPipeline* mGraphicsPipeline = nullptr;
 	
 
 	void cleanup();
@@ -65,6 +70,14 @@ void AhtomEngine::initVulkan()
 	mAhtomDevice->createLogicalDevice(mWindow->getSurface());
 
 	mSwapChain = new AhtomSwapChain(*mAhtomDevice, mWindow->getSurface());
+
+	mSwapChain->createImageViews(*mAhtomDevice);
+
+	mRenderPass = new AhtomRenderPass(*mAhtomDevice, *mSwapChain);
+
+	mDescriptor = new AhtomDescriptor(*mAhtomDevice);
+
+	mGraphicsPipeline = new AhtomGraphicsPipeline(*mAhtomDevice, *mSwapChain, *mDescriptor, *mRenderPass);
 }
 
 
