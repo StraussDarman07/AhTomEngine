@@ -1,15 +1,21 @@
-#pragma once
+module;
 
 #include <algorithm>
 #include <optional>
 #include <vulkan/vulkan_core.h>
+#include <vector>
+#include <set>
+#include <string>
+#include <stdexcept>
 
-namespace Core::Device
+export module VulkanDevice;
+
+namespace Device
 {
-	constexpr uint32_t WIDTH = 800;
-	constexpr uint32_t HEIGHT = 600;
-	
-	struct QueueFamilyIndices
+	export constexpr uint32_t WIDTH = 800;
+	export constexpr uint32_t HEIGHT = 600;
+
+	export struct QueueFamilyIndices
 	{
 		std::optional<uint32_t> graphicsFamily;
 		std::optional<uint32_t> presentFamily;
@@ -20,14 +26,14 @@ namespace Core::Device
 		}
 	};
 
-	struct SwapChainSupportDetails
+	export struct SwapChainSupportDetails
 	{
 		VkSurfaceCapabilitiesKHR capabilities;
 		std::vector<VkSurfaceFormatKHR> formats;
 		std::vector<VkPresentModeKHR> present_modes;
 	};
 
-	inline SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
+	export SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
 	{
 		SwapChainSupportDetails details;
 
@@ -36,7 +42,7 @@ namespace Core::Device
 		uint32_t formatCount;
 		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
 
-		if(formatCount != 0)
+		if (formatCount != 0)
 		{
 			details.formats.resize(formatCount);
 			vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
@@ -45,22 +51,22 @@ namespace Core::Device
 		uint32_t present_mode_count;
 		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &present_mode_count, nullptr);
 
-		if(present_mode_count != 0)
+		if (present_mode_count != 0)
 		{
 			details.present_modes.resize(present_mode_count);
 			vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &present_mode_count, details.present_modes.data());
 		}
-		
+
 		return details;
 	}
 
-	inline VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &available_formats)
+	export VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& available_formats)
 	{
 		VkSurfaceFormatKHR retVal = available_formats[0];
-		
-		for(const VkSurfaceFormatKHR available_format : available_formats)
+
+		for (const VkSurfaceFormatKHR available_format : available_formats)
 		{
-			if(available_format.format == VK_FORMAT_B8G8R8A8_SRGB && available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+			if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB && available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
 			{
 				retVal = available_format;
 				break;
@@ -70,11 +76,11 @@ namespace Core::Device
 		return retVal;
 	}
 
-	inline VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &available_present_modes)
+	export VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& available_present_modes)
 	{
-		VkPresentModeKHR retVal =  VK_PRESENT_MODE_FIFO_KHR;
+		VkPresentModeKHR retVal = VK_PRESENT_MODE_FIFO_KHR;
 
-		for(const VkPresentModeKHR available_present_mode : available_present_modes)
+		for (const VkPresentModeKHR available_present_mode : available_present_modes)
 		{
 			if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
 			{
@@ -86,11 +92,11 @@ namespace Core::Device
 		return retVal;
 	}
 
-	inline VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities)
+	export VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 	{
 		VkExtent2D actual_extent;
-		
-		if(capabilities.currentExtent.width != UINT32_MAX)
+
+		if (capabilities.currentExtent.width != UINT32_MAX)
 		{
 			actual_extent = capabilities.currentExtent;
 		}
@@ -105,8 +111,8 @@ namespace Core::Device
 
 		return actual_extent;
 	}
-	
-	inline QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
+
+	export QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
 	{
 		//Logic to find graphics queue family
 		QueueFamilyIndices indices;
@@ -129,22 +135,22 @@ namespace Core::Device
 			VkBool32 presentSupport = false;
 			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
 
-			if(presentSupport)
+			if (presentSupport)
 			{
 				indices.presentFamily = i;
 			}
 
 			if (indices.isComplete())
 				break;
-			
+
 			++i;
 		}
 
-		
+
 		return indices;
 	}
 
-	const std::vector<const char*> deviceExtensions = {
+	export const std::vector<const char*> deviceExtensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
@@ -158,15 +164,15 @@ namespace Core::Device
 
 		std::set<std::string> required_extensions(deviceExtensions.begin(), deviceExtensions.end());
 
-		for(const VkExtensionProperties extension : available_extensions)
+		for (const VkExtensionProperties extension : available_extensions)
 		{
 			required_extensions.erase(extension.extensionName);
 		}
-		
+
 		return required_extensions.empty();
 	}
-	
-	inline bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
+
+	export bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
 	{
 		const QueueFamilyIndices indices = findQueueFamilies(device, surface);
 
@@ -174,7 +180,7 @@ namespace Core::Device
 
 		bool swap_chain_adequate = false;
 
-		if(extension_supported)
+		if (extension_supported)
 		{
 			SwapChainSupportDetails swap_chain_support = querySwapChainSupport(device, surface);
 			swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
@@ -182,7 +188,7 @@ namespace Core::Device
 
 		VkPhysicalDeviceFeatures supportedFeatures;
 		vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
-		
+
 		return indices.isComplete() && extension_supported && swap_chain_adequate && supportedFeatures.samplerAnisotropy;
 	}
 

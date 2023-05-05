@@ -1,27 +1,39 @@
-﻿# CMakeList.txt : Top-level CMake project file, do global configuration
-# and include sub-projects here.
-cmake_minimum_required (VERSION 3.9)
+﻿cmake_minimum_required(VERSION 3.26)
 
-# specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "2182bf5c-ef0d-489a-91da-49dbc3090d2a")
+set(CMAKE_EXPERIMENTAL_CXX_MODULE_DYNDEP ON)
+
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project (AhTomEngine VERSION 1.0.0)
 
-#includes
-include_directories(src)
+include_directories(src/Core)
 
 #Source Files
-file(GLOB_RECURSE SOURCES 
-    src/*.h
-    src/*.cpp
+set(ALL_SOURCE_FILES 
+    "main.cpp"    
 )
 
-set(ALL_SOURCE_FILES ${SOURCES})
+set(ENGINE_MODULE_FILES 
+	"src/Core/AhtomEngine.ixx"
+    "src/Core/Types/EngineTypes.ixx" 
+    "src/Core/Types/AhtomDevice.ixx" 
+    "src/Core/Types/AhtomInstance.ixx"  
+    "src/Core/Types/AhtomWindow.ixx"
+    "src/Core/Misc/VulkanDebug.ixx"
+    "src/Core/Misc/VulkanHelper.ixx"
+    "src/Core/Misc/VulkanDevice.ixx" "src/Core/Types/AhtomSwapChain.ixx")
 
+message("Modules: ${ENGINE_MODULE_FILES}")
 configure_file(main.h.in main.h)
-add_executable(${PROJECT_NAME} "main.cpp" ${ALL_SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${ALL_SOURCE_FILES})
 
+target_sources(${PROJECT_NAME}
+  PUBLIC
+    FILE_SET modules TYPE CXX_MODULES FILES
+    ${ENGINE_MODULE_FILES}
+)
 
 # GLFW3 Include
 set(GLFW3 "${PROJECT_SOURCE_DIR}/submodules/glfw")
@@ -48,20 +60,21 @@ target_include_directories(${PROJECT_NAME} PUBLIC
                            )
 
 
+
 if (WIN32)                          
-    add_custom_command(TARGET AhTomEngine PRE_BUILD
+    add_custom_command(TARGET AhTomEngine POST_BUILD
                                 COMMAND cmd /c ${CMAKE_SOURCE_DIR}/compile_shader.bat
                                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 else()
-    add_custom_command(TARGET AhTomEngine PRE_BUILD
+    add_custom_command(TARGET AhTomEngine POST_BUILD
                                 COMMAND ${CMAKE_SOURCE_DIR}/compile_shader.sh
                                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 
-add_custom_command(TARGET AhTomEngine PRE_BUILD
+add_custom_command(TARGET AhTomEngine POST_BUILD
                             COMMAND ${CMAKE_COMMAND} -E copy_directory
                             ${CMAKE_SOURCE_DIR}/shaders/ $<TARGET_FILE_DIR:AhTomEngine>/shaders/)
 
-add_custom_command(TARGET AhTomEngine PRE_BUILD
+add_custom_command(TARGET AhTomEngine POST_BUILD
                             COMMAND ${CMAKE_COMMAND} -E copy_directory
                             ${CMAKE_SOURCE_DIR}/textures/ $<TARGET_FILE_DIR:AhTomEngine>/textures/)

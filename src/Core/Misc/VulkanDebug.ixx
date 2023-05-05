@@ -1,21 +1,27 @@
+module;
+
 #include <iostream>
 #include <ostream>
 #include <vector>
 #include <cstring>
 #include <vulkan/vulkan.h>
 
-namespace Core::Debug
+export module VulkanDebug;
+
+import VulkanHelper;
+
+namespace Debug
 {
 #ifdef _DEBUG
-	const bool enableValidationLayers = true;
+	export const bool enableValidationLayers = true;
 #else
-	const bool enableValidationLayers = false;
+	export const bool enableValidationLayers = false;
 #endif
 
-	const std::vector<const char*> validationLayers = {
+	export const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
 	};
-	
+
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
 		VkDebugUtilsMessageTypeFlagsEXT message_type,
 		const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
@@ -26,7 +32,7 @@ namespace Core::Debug
 		return VK_FALSE;
 	}
 
-	inline void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+	export void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
 	{
 		createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -35,7 +41,7 @@ namespace Core::Debug
 		createInfo.pfnUserCallback = debugCallback;
 	}
 
-	inline void setupDebugMessenger(VkInstance instance, VkDebugUtilsMessengerEXT* debugMessenger)
+	export void setupDebugMessenger(VkInstance instance, VkDebugUtilsMessengerEXT* debugMessenger)
 	{
 		if constexpr (!enableValidationLayers) return;
 
@@ -47,7 +53,7 @@ namespace Core::Debug
 		}
 	}
 
-	inline bool checkValidationLayerSupport()
+	export bool checkValidationLayerSupport()
 	{
 		uint32_t layerCount;
 		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
