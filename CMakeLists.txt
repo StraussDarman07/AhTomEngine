@@ -3,24 +3,27 @@
 cmake_minimum_required (VERSION 3.9)
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project (AhTomEngine VERSION 1.0.0)
 
-#includes
-include_directories(src)
-
-#Source Files
-file(GLOB_RECURSE SOURCES 
-    src/*.h
-    src/*.cpp
-)
-
 set(ALL_SOURCE_FILES ${SOURCES})
 
 configure_file(main.h.in main.h)
-add_executable(${PROJECT_NAME} "main.cpp" ${ALL_SOURCE_FILES})
+add_executable(${PROJECT_NAME} "main.cpp"
+
+    "src/core/AhTomEngine.h"
+    "src/core/AhTomEngine.cpp"
+    "src/types/AhTomTypes.h"
+    
+    "src/core/vulkan/VkValidationLayerSupport.h" 
+    "src/core/vulkan/VKExtensionSupport.h" "src/core/vulkan/VkDebugSupport.h" "src/core/vulkan/VkDebugSupport.cpp" "src/core/engine/AhTomPhysicalDevice.h" "src/core/engine/AhTomPhysicalDevice.cpp")
+
+# Include paths
+target_include_directories(${PROJECT_NAME} PRIVATE
+    src
+)
 
 
 # GLFW3 Include

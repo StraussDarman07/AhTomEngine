@@ -8,24 +8,25 @@
 
 #include <iostream>
 #include "main.h"
-#include "src/Core/AhtomEngine.h"
+#include "src/core/AhtomEngine.h"
 
 int main()
 {
-    std::cout << "AhTom Engine Version " << ENGINE_VERSION_MAJOR << "."
-        << ENGINE_VERSION_MINOR << std::endl;
+	std::cout << "AhTom Engine Version " << ENGINE_VERSION_MAJOR << "."
+	          << ENGINE_VERSION_MINOR << std::endl;
 
-    Core::AhTomEngine* engine = new Core::AhTomEngine(ENGINE_VERSION_MAJOR, ENGINE_VERSION_MINOR, ENGINE_VERSION_PATCH);
+	Core::AhTomEngine* engine = new Core::AhTomEngine(ENGINE_VERSION_MAJOR, ENGINE_VERSION_MINOR, ENGINE_VERSION_PATCH);
 
-    try {
+	try
+	{
 
-        engine->run();
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+		engine->run();
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
 
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
