@@ -34,10 +34,10 @@
 #define throwEx(x) throw std::runtime_error(x)
 
 const std::vector<Vertex> vertices = {
-	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
 };
 
 const std::vector<uint16_t> indices = {
@@ -84,7 +84,9 @@ void Core::AhTomEngine::initVulkan()
 	Debug::setupDebugMessenger(instance, &debugMessenger);
 	createSurface();
 	pickPhysicalDevice();
+
 	createLogicalDevice();
+
 	createSwapChain();
 	createImageViews();
 	createRenderPass();
@@ -106,11 +108,11 @@ void Core::AhTomEngine::initVulkan()
 
 void Core::AhTomEngine::createInstance()
 {
-	if(Debug::enableValidationLayers && !Debug::checkValidationLayerSupport())
+	if (Debug::enableValidationLayers && !Debug::checkValidationLayerSupport())
 	{
 		throwEx("validation layers requested, but not available");
 	}
-	
+
 	VkApplicationInfo appInfo{};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = applicationName.c_str();
@@ -124,7 +126,7 @@ void Core::AhTomEngine::createInstance()
 	createInfo.pApplicationInfo = &appInfo;
 
 	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-	if(Debug::enableValidationLayers)
+	if (Debug::enableValidationLayers)
 	{
 		createInfo.enabledLayerCount = static_cast<uint32_t>(Debug::validationLayers.size());
 		createInfo.ppEnabledLayerNames = Debug::validationLayers.data();
@@ -145,7 +147,7 @@ void Core::AhTomEngine::createInstance()
 	createInfo.ppEnabledExtensionNames = glfwExtensions.data();
 
 
-	if(vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
+	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
 	{
 		throwEx("failed to create instance!");
 	}
@@ -156,7 +158,7 @@ void Core::AhTomEngine::createInstance()
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 
 	std::vector<VkExtensionProperties> extensions(extensionCount);
-	
+
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
 	bool allRequiredExternsionExist = true;
@@ -166,10 +168,10 @@ void Core::AhTomEngine::createInstance()
 		bool foundExtension = false;
 
 		std::string currentExtension = glfwExtensions[i];
-		
+
 		for (const auto& extension : extensions)
 		{
-			if(extension.extensionName == currentExtension)
+			if (extension.extensionName == currentExtension)
 			{
 				foundExtension = true;
 				break;
@@ -179,7 +181,7 @@ void Core::AhTomEngine::createInstance()
 		allRequiredExternsionExist &= foundExtension;
 	}
 
-	if(!allRequiredExternsionExist)
+	if (!allRequiredExternsionExist)
 	{
 		println("Not all required extensions are present");
 	}
@@ -197,7 +199,7 @@ void Core::AhTomEngine::pickPhysicalDevice()
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 
-	if(deviceCount == 0)
+	if (deviceCount == 0)
 	{
 		throwEx("failed to find GPU's with Vulkan support!");
 	}
@@ -206,16 +208,16 @@ void Core::AhTomEngine::pickPhysicalDevice()
 
 	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
-	for(const VkPhysicalDevice &device : devices)
+	for (const VkPhysicalDevice& device : devices)
 	{
-		if(Device::isDeviceSuitable(device, surface))
+		if (Device::isDeviceSuitable(device, surface))
 		{
 			physicalDevice = device;
 			break;
 		}
 	}
 
-	if(physicalDevice == VK_NULL_HANDLE)
+	if (physicalDevice == VK_NULL_HANDLE)
 	{
 		throwEx("failed to find a sutiable GPU");
 	}
@@ -248,7 +250,7 @@ void Core::AhTomEngine::createLogicalDevice()
 
 	float queuePriority = 1.0f;
 
-	for(uint32_t queue_family : unique_queue_families)
+	for (uint32_t queue_family : unique_queue_families)
 	{
 		VkDeviceQueueCreateInfo queueCreateInfo{};
 		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -270,11 +272,11 @@ void Core::AhTomEngine::createLogicalDevice()
 	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
 
 	createInfo.pEnabledFeatures = &device_features;
-	
+
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(Device::deviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = Device::deviceExtensions.data();
 
-	if(Debug::enableValidationLayers)
+	if (Debug::enableValidationLayers)
 	{
 		createInfo.enabledLayerCount = static_cast<uint32_t>(Debug::validationLayers.size());
 		createInfo.ppEnabledLayerNames = Debug::validationLayers.data();
@@ -295,7 +297,7 @@ void Core::AhTomEngine::createLogicalDevice()
 
 void Core::AhTomEngine::createSurface()
 {
-	if(glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+	if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
 	{
 		throwEx("failed to create window surface!");
 	}
@@ -313,7 +315,7 @@ void Core::AhTomEngine::createSwapChain()
 
 	uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
 
-	if(swap_chain_support.capabilities.maxImageArrayLayers > 0 && image_count > swap_chain_support.capabilities.maxImageCount)
+	if (swap_chain_support.capabilities.maxImageArrayLayers > 0 && image_count > swap_chain_support.capabilities.maxImageCount)
 	{
 		image_count = swap_chain_support.capabilities.maxImageCount;
 	}
@@ -352,7 +354,7 @@ void Core::AhTomEngine::createSwapChain()
 
 	create_info.oldSwapchain = VK_NULL_HANDLE;
 
-	if(vkCreateSwapchainKHR(device, &create_info, nullptr, &swapChain) != VK_SUCCESS)
+	if (vkCreateSwapchainKHR(device, &create_info, nullptr, &swapChain) != VK_SUCCESS)
 	{
 		throwEx("failed to create swap chain");
 	}
@@ -383,10 +385,18 @@ void Core::AhTomEngine::createDescriptorSetLayout()
 	uboLayoutBinding.pImmutableSamplers = nullptr;
 	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
+	VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+	samplerLayoutBinding.binding = 1;
+	samplerLayoutBinding.descriptorCount = 1;
+	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	samplerLayoutBinding.pImmutableSamplers = nullptr;
+	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutInfo.bindingCount = 1;
-	layoutInfo.pBindings = &uboLayoutBinding;
+	layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+	layoutInfo.pBindings = bindings.data();
 
 	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout!");
@@ -419,7 +429,7 @@ void Core::AhTomEngine::createGraphicsPipeline()
 
 	auto bindingDescription = Vertex::getBindingDescription();
 	auto attributeDescriptions = Vertex::getAttributeDescriptions();
-	
+
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexBindingDescriptionCount = 1;
@@ -526,7 +536,7 @@ void Core::AhTomEngine::createGraphicsPipeline()
 	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
-	
+
 	vkDestroyShaderModule(device, fragShaderModule, nullptr);
 	vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
@@ -568,7 +578,7 @@ void Core::AhTomEngine::createRenderPass()
 	renderPassInfo.pSubpasses = &subpass;
 	renderPassInfo.dependencyCount = 1;
 	renderPassInfo.pDependencies = &dependency;
-	
+
 	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
 	}
@@ -658,7 +668,7 @@ void Core::AhTomEngine::createCommandBuffers()
 		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
 		vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
-		
+
 		vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
 		vkCmdEndRenderPass(commandBuffers[i]);
@@ -700,15 +710,18 @@ void Core::AhTomEngine::createUniformBuffers() {
 
 void Core::AhTomEngine::createDescriptorPool()
 {
-	VkDescriptorPoolSize poolSize{};
-	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSize.descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+
+	std::array<VkDescriptorPoolSize, 2> poolSizes{};
+	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolInfo.poolSizeCount = 1;
-	poolInfo.pPoolSizes = &poolSize;
-	poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
+	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	poolInfo.pPoolSizes = poolSizes.data();
+	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
 	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor pool!");
@@ -773,7 +786,7 @@ void Core::AhTomEngine::cleanupSwapChain()
 	}
 
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-	
+
 	vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
 	vkDestroyPipeline(device, graphicsPipeline, nullptr);
@@ -822,21 +835,36 @@ void Core::AhTomEngine::createDescriptorSets()
 	}
 
 	for (size_t i = 0; i < swapChainImages.size(); i++) {
+
 		VkDescriptorBufferInfo bufferInfo{};
 		bufferInfo.buffer = uniformBuffers[i];
 		bufferInfo.offset = 0;
 		bufferInfo.range = sizeof(UniformBufferObject);
 
-		VkWriteDescriptorSet descriptorWrite{};
-		descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrite.dstSet = descriptorSets[i];
-		descriptorWrite.dstBinding = 0;
-		descriptorWrite.dstArrayElement = 0;
-		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		descriptorWrite.descriptorCount = 1;
-		descriptorWrite.pBufferInfo = &bufferInfo;
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = textureImageView;
+		imageInfo.sampler = textureSampler;
 
-		vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
+		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = descriptorSets[i];
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].dstArrayElement = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = descriptorSets[i];
+		descriptorWrites[1].dstBinding = 1;
+		descriptorWrites[1].dstArrayElement = 0;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pImageInfo = &imageInfo;
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
 }
 
@@ -852,7 +880,7 @@ void Core::AhTomEngine::createTextureImage()
 
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
-	
+
 	Buffer::createBuffer(device, physicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	void* data;
@@ -888,8 +916,8 @@ void Core::AhTomEngine::createTextureSampler() {
 	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	samplerInfo.anisotropyEnable = VK_FALSE;
-	samplerInfo.maxAnisotropy = 1.0f;
+	samplerInfo.anisotropyEnable = VK_TRUE;
+	samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
 	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
 	samplerInfo.unnormalizedCoordinates = VK_FALSE;
 	samplerInfo.compareEnable = VK_FALSE;
@@ -910,7 +938,7 @@ void Core::AhTomEngine::recreateSwapChain()
 		glfwGetFramebufferSize(window, &width, &height);
 		glfwWaitEvents();
 	}
-	
+
 	vkDeviceWaitIdle(device);
 
 	cleanupSwapChain();
@@ -946,7 +974,7 @@ void Core::AhTomEngine::drawFrame()
 	uint32_t imageIndex;
 	VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-	if(result == VK_ERROR_OUT_OF_DATE_KHR)
+	if (result == VK_ERROR_OUT_OF_DATE_KHR)
 	{
 		recreateSwapChain();
 		return;
@@ -955,14 +983,14 @@ void Core::AhTomEngine::drawFrame()
 	{
 		throw std::runtime_error("failed to acquire swap chain image!");
 	}
-	
+
 	if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
 		vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
 	}
 	imagesInFlight[imageIndex] = inFlightFences[currentFrame];
 
 	updateUniformBuffer(imageIndex);
-	
+
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -981,11 +1009,11 @@ void Core::AhTomEngine::drawFrame()
 
 
 	vkResetFences(device, 1, &inFlightFences[currentFrame]);
-	
+
 	if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
 		throw std::runtime_error("failed to submit draw command buffer!");
 	}
-	
+
 	VkPresentInfoKHR presentInfo{};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	presentInfo.waitSemaphoreCount = 1;
@@ -999,12 +1027,12 @@ void Core::AhTomEngine::drawFrame()
 
 	result = vkQueuePresentKHR(presentQueue, &presentInfo);
 
-	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) 
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized)
 	{
 		framebufferResized = false;
 		recreateSwapChain();
 	}
-	else if (result != VK_SUCCESS) 
+	else if (result != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to present swap chain image!");
 	}
@@ -1022,7 +1050,7 @@ void Core::AhTomEngine::cleanup()
 
 	vkDestroyImage(device, textureImage, nullptr);
 	vkFreeMemory(device, textureImageMemory, nullptr);
-	
+
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
 	vkDestroyBuffer(device, indexBuffer, nullptr);
@@ -1030,26 +1058,26 @@ void Core::AhTomEngine::cleanup()
 
 	vkDestroyBuffer(device, vertexBuffer, nullptr);
 	vkFreeMemory(device, vertexBufferMemory, nullptr);
-	
+
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
 		vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
 		vkDestroyFence(device, inFlightFences[i], nullptr);
 	}
-	
+
 	vkDestroyCommandPool(device, commandPool, nullptr);
 
 	vkDestroyDevice(device, nullptr);
-	
-	if(Debug::enableValidationLayers)
+
+	if (Debug::enableValidationLayers)
 	{
 		Misc::DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 	}
 
 	vkDestroySurfaceKHR(instance, surface, nullptr);
-	
+
 	vkDestroyInstance(instance, nullptr);
-	
+
 	glfwDestroyWindow(window);
 
 	glfwTerminate();
