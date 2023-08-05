@@ -8,6 +8,16 @@ Core::Engine::AhTomPhysicalDevice::AhTomPhysicalDevice(const VkInstance& instanc
 	pickPhysicalDevice(instance);
 }
 
+Types::QueueFamilyIndices Core::Engine::AhTomPhysicalDevice::findQueueFamilies() const
+{
+	return findQueueFamilies(mPhysicalDevice);
+}
+
+Core::Engine::AhTomPhysicalDevice::operator VkPhysicalDevice() const
+{
+	return mPhysicalDevice;
+}
+
 void Core::Engine::AhTomPhysicalDevice::pickPhysicalDevice(const VkInstance& instance)
 {
 	uint32_t deviceCount = 0;
@@ -43,7 +53,7 @@ bool Core::Engine::AhTomPhysicalDevice::isDeviceSuitable(VkPhysicalDevice device
 	return indices.isComplete();
 }
 
-Types::QueueFamilyIndices Core::Engine::AhTomPhysicalDevice::findQueueFamilies(VkPhysicalDevice device)
+Types::QueueFamilyIndices Core::Engine::AhTomPhysicalDevice::findQueueFamilies(VkPhysicalDevice device) const
 {
 	Types::QueueFamilyIndices indices;
 

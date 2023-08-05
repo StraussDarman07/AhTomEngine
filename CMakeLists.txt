@@ -18,7 +18,11 @@ add_executable(${PROJECT_NAME} "main.cpp"
     "src/types/AhTomTypes.h"
     
     "src/core/vulkan/VkValidationLayerSupport.h" 
-    "src/core/vulkan/VKExtensionSupport.h" "src/core/vulkan/VkDebugSupport.h" "src/core/vulkan/VkDebugSupport.cpp" "src/core/engine/AhTomPhysicalDevice.h" "src/core/engine/AhTomPhysicalDevice.cpp")
+    "src/core/vulkan/VKExtensionSupport.h" 
+    "src/core/vulkan/VkDebugSupport.h" "src/core/vulkan/VkDebugSupport.cpp" 
+    
+    "src/core/engine/AhTomPhysicalDevice.h" "src/core/engine/AhTomPhysicalDevice.cpp" 
+    "src/core/engine/AhTomLogicalDevice.h" "src/core/engine/AhTomLogicalDevice.cpp")
 
 # Include paths
 target_include_directories(${PROJECT_NAME} PRIVATE

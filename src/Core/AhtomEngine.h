@@ -5,12 +5,13 @@
 
 #include <vulkan/vulkan.h>
 
-class GLFWwindow;
+struct GLFWwindow;
 namespace Core
 {
 	namespace Engine
 	{
 		class AhTomPhysicalDevice;
+		class AhTomLogicalDevice;
 	}
 	class AhTomEngine
 	{
@@ -33,5 +34,6 @@ namespace Core
 		const Types::Version mVersion;
 
 		std::unique_ptr<Engine::AhTomPhysicalDevice> mPhysicalDevice;
+		std::unique_ptr<Engine::AhTomLogicalDevice> mLogicalDevice;
 	};
 }

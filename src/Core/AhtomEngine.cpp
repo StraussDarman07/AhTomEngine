@@ -1,6 +1,7 @@
 #include "AhtomEngine.h"
 
 #include "engine/AhTomPhysicalDevice.h"
+#include "engine/AhTomLogicalDevice.h"
 
 #include "vulkan/VkValidationLayerSupport.h"
 #include "vulkan/VKExtensionSupport.h"
@@ -23,6 +24,7 @@ constexpr char ENGINE_NAME[] = "AhTomEngine";
 Core::AhTomEngine::AhTomEngine(int major, int minor, int patch) :
 	mWindow(nullptr),
 	mPhysicalDevice(nullptr),
+	mLogicalDevice(nullptr),
 	mVersion(Types::Version{major, minor, patch})
 {
 }
@@ -52,6 +54,8 @@ void Core::AhTomEngine::initVulkan()
 	mDebugger.setup(mInstance);
 
 	mPhysicalDevice = std::make_unique<Engine::AhTomPhysicalDevice>(mInstance);
+
+	mLogicalDevice = std::make_unique<Engine::AhTomLogicalDevice>(*mPhysicalDevice.get());
 }
 
 void Core::AhTomEngine::mainLoop()
@@ -64,6 +68,8 @@ void Core::AhTomEngine::mainLoop()
 
 void Core::AhTomEngine::cleanup()
 {
+	mLogicalDevice->destroy();
+
 	mDebugger.cleanup(mInstance);
 
 	vkDestroyInstance(mInstance, nullptr);
