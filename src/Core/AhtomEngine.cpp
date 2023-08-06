@@ -27,6 +27,8 @@ Core::AhTomEngine::AhTomEngine(int major, int minor, int patch) :
 	mPhysicalDevice(nullptr),
 	mWindowSurface(nullptr),
 	mLogicalDevice(nullptr),
+	mDebugger(Vulkan::VkDebugger{}),
+	mInstance(VK_NULL_HANDLE),
 	mVersion(Types::Version{major, minor, patch})
 {
 }
@@ -57,7 +59,7 @@ void Core::AhTomEngine::initVulkan()
 
 	mWindowSurface = std::make_unique <Engine::AhTomWindowSurface>(mInstance, mWindow);
 
-	mPhysicalDevice = std::make_unique<Engine::AhTomPhysicalDevice>(mInstance);
+	mPhysicalDevice = std::make_unique<Engine::AhTomPhysicalDevice>(mInstance, *mWindowSurface.get());
 
 	mLogicalDevice = std::make_unique<Engine::AhTomLogicalDevice>(*mPhysicalDevice.get());
 }

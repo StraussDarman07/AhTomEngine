@@ -72,15 +72,15 @@ Types::QueueFamilyIndices Core::Engine::AhTomPhysicalDevice::findQueueFamilies(V
 
 		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 		{
-			indices.graphicsFamily = i;
+			indices.graphicsFamily = static_cast<uint32_t>(i);
 		}
 
 		VkBool32 presentSupport = false;
-		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mWindowSurface.surface(), &presentSupport);
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, static_cast<uint32_t>(i), mWindowSurface.surface(), &presentSupport);
 
 		if (presentSupport)
 		{
-			indices.presentFamily = i;
+			indices.presentFamily = static_cast<uint32_t>(i);
 		}
 	}
 
