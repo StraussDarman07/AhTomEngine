@@ -12,6 +12,7 @@ namespace Core
 	{
 		class AhTomPhysicalDevice;
 		class AhTomLogicalDevice;
+		class AhTomWindowSurface;
 	}
 	class AhTomEngine
 	{
@@ -33,6 +34,7 @@ namespace Core
 		VkInstance mInstance;
 		const Types::Version mVersion;
 
+		std::unique_ptr<Engine::AhTomWindowSurface> mWindowSurface;
 		std::unique_ptr<Engine::AhTomPhysicalDevice> mPhysicalDevice;
 		std::unique_ptr<Engine::AhTomLogicalDevice> mLogicalDevice;
 	};

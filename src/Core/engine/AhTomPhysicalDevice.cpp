@@ -1,9 +1,11 @@
 #include "AhTomPhysicalDevice.h"
 
+#include "AhTomWindowSurface.h"
+
 #include <stdexcept>
 #include <vector>
 
-Core::Engine::AhTomPhysicalDevice::AhTomPhysicalDevice(const VkInstance& instance)
+Core::Engine::AhTomPhysicalDevice::AhTomPhysicalDevice(const VkInstance& instance, const AhTomWindowSurface& windowSurface) : mWindowSurface(windowSurface)
 {
 	pickPhysicalDevice(instance);
 }
@@ -13,7 +15,7 @@ Types::QueueFamilyIndices Core::Engine::AhTomPhysicalDevice::findQueueFamilies()
 	return findQueueFamilies(mPhysicalDevice);
 }
 
-Core::Engine::AhTomPhysicalDevice::operator VkPhysicalDevice() const
+VkPhysicalDevice Core::Engine::AhTomPhysicalDevice::physicalDevice() const
 {
 	return mPhysicalDevice;
 }
@@ -71,6 +73,14 @@ Types::QueueFamilyIndices Core::Engine::AhTomPhysicalDevice::findQueueFamilies(V
 		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 		{
 			indices.graphicsFamily = i;
+		}
+
+		VkBool32 presentSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mWindowSurface.surface(), &presentSupport);
+
+		if (presentSupport)
+		{
+			indices.presentFamily = i;
 		}
 	}
 

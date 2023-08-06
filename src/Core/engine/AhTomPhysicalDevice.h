@@ -6,14 +6,15 @@
 
 namespace Core::Engine
 {
+	class AhTomWindowSurface;
 	class AhTomPhysicalDevice
 	{
 	public:
-		explicit AhTomPhysicalDevice(const VkInstance& instance);
+		explicit AhTomPhysicalDevice(const VkInstance& instance, const AhTomWindowSurface& windowSurface);
 
 		Types::QueueFamilyIndices findQueueFamilies() const;
 
-		operator VkPhysicalDevice() const;
+		VkPhysicalDevice physicalDevice() const;
 
 	private:
 		void pickPhysicalDevice(const VkInstance& instance);
@@ -21,5 +22,6 @@ namespace Core::Engine
 		Types::QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) const;
 
 		VkPhysicalDevice mPhysicalDevice = VK_NULL_HANDLE;
+		const AhTomWindowSurface& mWindowSurface;
 	};
 }

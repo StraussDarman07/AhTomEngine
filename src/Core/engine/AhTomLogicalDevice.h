@@ -19,6 +19,8 @@ namespace Core::Engine
 		void createLogicalDevice(const AhTomPhysicalDevice& physicalDevice);
 
 		VkDevice mDevice;
+
 		VkQueue mGraphicsQueue;
+		VkQueue mPresentQueue;
 	};
 }

@@ -22,7 +22,7 @@ add_executable(${PROJECT_NAME} "main.cpp"
     "src/core/vulkan/VkDebugSupport.h" "src/core/vulkan/VkDebugSupport.cpp" 
     
     "src/core/engine/AhTomPhysicalDevice.h" "src/core/engine/AhTomPhysicalDevice.cpp" 
-    "src/core/engine/AhTomLogicalDevice.h" "src/core/engine/AhTomLogicalDevice.cpp")
+    "src/core/engine/AhTomLogicalDevice.h" "src/core/engine/AhTomLogicalDevice.cpp" "src/core/engine/AhTomWindowSurface.h" "src/core/engine/AhTomWindowSurface.cpp")
 
 # Include paths
 target_include_directories(${PROJECT_NAME} PRIVATE
