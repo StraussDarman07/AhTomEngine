@@ -1,8 +1,11 @@
 #pragma once
 
+#include <vulkan/vulkan.h>
+
 #include <string>
 #include <format>
 #include <optional>
+#include <vector>
 
 namespace Types
 {
@@ -30,5 +33,12 @@ namespace Types
 		{
 			return graphicsFamily.has_value() && presentFamily.has_value();
 		}
+	};
+
+	struct SwapChainSupportDetails
+	{
+		VkSurfaceCapabilitiesKHR capabilities;
+		std::vector<VkSurfaceFormatKHR> formats;
+		std::vector<VkPresentModeKHR> presentModes;
 	};
 }

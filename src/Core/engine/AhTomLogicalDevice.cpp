@@ -1,5 +1,7 @@
 #include "AhTomLogicalDevice.h"
 
+#include "AhTomDefines.h"
+
 #include "core/vulkan/VkValidationLayerSupport.h"
 #include "types/AhTomTypes.h"
 
@@ -50,7 +52,8 @@ void Core::Engine::AhTomLogicalDevice::createLogicalDevice(const AhTomPhysicalDe
 
 	createInfo.pEnabledFeatures = &deviceFeatures;
 
-	createInfo.enabledExtensionCount = 0;
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(DEVICE_EXTENSIONS.size());
+	createInfo.ppEnabledExtensionNames = DEVICE_EXTENSIONS.data();
 
 	if (Vulkan::ENABLE_VALIDATION_LAYERS)
 	{

@@ -1,9 +1,12 @@
 #include "AhTomPhysicalDevice.h"
 
 #include "AhTomWindowSurface.h"
+#include "AhTomDefines.h"
 
 #include <stdexcept>
 #include <vector>
+#include <set>
+
 
 Core::Engine::AhTomPhysicalDevice::AhTomPhysicalDevice(const VkInstance& instance, const AhTomWindowSurface& windowSurface) : mWindowSurface(windowSurface)
 {
@@ -52,7 +55,35 @@ bool Core::Engine::AhTomPhysicalDevice::isDeviceSuitable(VkPhysicalDevice device
 {
 	Types::QueueFamilyIndices indices = findQueueFamilies(device);
 
-	return indices.isComplete();
+	bool extensionsSupported = checkDeviceExtensionSupport(device);
+
+	bool swapChainAdequate = false;
+
+	if (extensionsSupported)
+	{
+		Types::SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+	}
+
+	return indices.isComplete() && extensionsSupported && swapChainAdequate;
+}
+
+inline bool Core::Engine::AhTomPhysicalDevice::checkDeviceExtensionSupport(VkPhysicalDevice device)
+{
+	uint32_t extensionCount;
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+	std::set<std::string> requiredExtensions(DEVICE_EXTENSIONS.begin(), DEVICE_EXTENSIONS.end());
+
+	for (const auto& extension : availableExtensions)
+	{
+		requiredExtensions.erase(extension.extensionName);
+	}
+
+	return requiredExtensions.empty();
 }
 
 Types::QueueFamilyIndices Core::Engine::AhTomPhysicalDevice::findQueueFamilies(VkPhysicalDevice device) const
@@ -86,4 +117,36 @@ Types::QueueFamilyIndices Core::Engine::AhTomPhysicalDevice::findQueueFamilies(V
 
 	// Logic to find queue family indices to populate struct with
 	return indices;
+}
+
+Types::SwapChainSupportDetails Core::Engine::AhTomPhysicalDevice::querySwapChainSupport() const
+{
+	return querySwapChainSupport(mPhysicalDevice);
+}
+
+Types::SwapChainSupportDetails Core::Engine::AhTomPhysicalDevice::querySwapChainSupport(VkPhysicalDevice device) const
+{
+	Types::SwapChainSupportDetails details;
+
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mWindowSurface.surface(), &details.capabilities);
+
+	uint32_t formatCount;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(device, mWindowSurface.surface(), &formatCount, nullptr);
+
+	if (formatCount != 0)
+	{
+		details.formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, mWindowSurface.surface(), &formatCount, details.formats.data());
+	}
+
+	uint32_t presentModeCount;
+	vkGetPhysicalDeviceSurfacePresentModesKHR(device, mWindowSurface.surface(), &presentModeCount, nullptr);
+
+	if (presentModeCount != 0)
+	{
+		details.presentModes.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, mWindowSurface.surface(), &presentModeCount, details.presentModes.data());
+	}
+
+	return details;
 }
