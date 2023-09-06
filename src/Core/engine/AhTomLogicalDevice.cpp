@@ -17,9 +17,14 @@ void Core::Engine::AhTomLogicalDevice::destroy()
 	vkDestroyDevice(mDevice, nullptr);
 }
 
-VkQueue Core::Engine::AhTomLogicalDevice::getGraphicsQueue()
+VkQueue Core::Engine::AhTomLogicalDevice::getGraphicsQueue() const
 {
 	return mGraphicsQueue;
+}
+
+VkDevice Core::Engine::AhTomLogicalDevice::getDevice() const
+{
+	return mDevice;
 }
 
 void Core::Engine::AhTomLogicalDevice::createLogicalDevice(const AhTomPhysicalDevice& physicalDevice)

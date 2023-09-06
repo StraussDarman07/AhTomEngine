@@ -13,6 +13,7 @@ namespace Core
 		class AhTomPhysicalDevice;
 		class AhTomLogicalDevice;
 		class AhTomWindowSurface;
+		class AhTomSwapChain;
 	}
 	class AhTomEngine
 	{
@@ -37,5 +38,6 @@ namespace Core
 		std::unique_ptr<Engine::AhTomWindowSurface> mWindowSurface;
 		std::unique_ptr<Engine::AhTomPhysicalDevice> mPhysicalDevice;
 		std::unique_ptr<Engine::AhTomLogicalDevice> mLogicalDevice;
+		std::unique_ptr<Engine::AhTomSwapChain> mSwapChain;
 	};
 }

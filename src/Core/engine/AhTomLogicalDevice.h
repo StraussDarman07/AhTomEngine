@@ -13,7 +13,8 @@ namespace Core::Engine
 
 		void destroy();
 
-		VkQueue getGraphicsQueue();
+		VkQueue getGraphicsQueue() const;
+		VkDevice getDevice() const;
 
 	private:
 		void createLogicalDevice(const AhTomPhysicalDevice& physicalDevice);
