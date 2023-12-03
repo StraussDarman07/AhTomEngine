@@ -33,6 +33,7 @@ namespace Core::Engine
 
 	private:
 		void createSwapChain(AhTomSwapChainRequirements requirements);
+        void createSwapChainImagesViews(AhTomSwapChainRequirements requirements);
 
 		VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 		VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
@@ -40,6 +41,7 @@ namespace Core::Engine
 
 		VkSwapchainKHR mSwapChain;
 		std::vector<VkImage> mSwapChainImages;
+        std::vector<VkImageView> mSwapChainImageViews;
 		VkFormat mSwapChainImageFormat;
 		VkExtent2D mSwapChainExtent;
 

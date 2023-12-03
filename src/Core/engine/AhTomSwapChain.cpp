@@ -4,13 +4,19 @@
 
 #include <algorithm>
 
-Core::Engine::AhTomSwapChain::AhTomSwapChain(AhTomSwapChainRequirements requirements) : mSwapChain(VK_NULL_HANDLE)
+Core::Engine::AhTomSwapChain::AhTomSwapChain(AhTomSwapChainRequirements requirements) : mSwapChain(VK_NULL_HANDLE), mSwapChainImageFormat(VkFormat::VK_FORMAT_UNDEFINED), mSwapChainExtent({})
 {
 	createSwapChain(requirements);
+
+    createSwapChainImagesViews(requirements);
 }
 
 void Core::Engine::AhTomSwapChain::destroy(const AhTomLogicalDevice& logicalDevice)
 {
+    for (auto imageView : mSwapChainImageViews) {
+        vkDestroyImageView(logicalDevice.getDevice(), imageView, nullptr);
+    }
+
 	vkDestroySwapchainKHR(logicalDevice.getDevice(), mSwapChain, nullptr);
 }
 
@@ -127,6 +133,35 @@ VkExtent2D Core::Engine::AhTomSwapChain::chooseSwapExtent(const VkSurfaceCapabil
 
 		return actualExtent;
 	}
+}
+
+void Core::Engine::AhTomSwapChain::createSwapChainImagesViews(AhTomSwapChainRequirements requirements) {
+    mSwapChainImageViews.resize(mSwapChainImages.size());
+
+    for (size_t i = 0; i < mSwapChainImages.size(); i++)
+    {
+        VkImageViewCreateInfo createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        createInfo.image = mSwapChainImages[i];
+
+        createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        createInfo.format = mSwapChainImageFormat;
+
+        createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+        createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        createInfo.subresourceRange.baseMipLevel = 0;
+        createInfo.subresourceRange.levelCount = 1;
+        createInfo.subresourceRange.baseArrayLayer = 0;
+        createInfo.subresourceRange.layerCount = 1;
+
+        if (vkCreateImageView(requirements.logicalDevice.getDevice(), &createInfo, nullptr, &mSwapChainImageViews[i]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create image views!");
+        }
+    }
 }
 
 
