@@ -13,16 +13,23 @@ set(ALL_SOURCE_FILES ${SOURCES})
 configure_file(main.h.in main.h)
 add_executable(${PROJECT_NAME} "main.cpp"
 
-    "src/core/AhTomEngine.h"
-    "src/core/AhTomEngine.cpp"
-    "src/types/AhTomTypes.h"
-    
-    "src/core/vulkan/VkValidationLayerSupport.h" 
-    "src/core/vulkan/VKExtensionSupport.h" 
-    "src/core/vulkan/VkDebugSupport.h" "src/core/vulkan/VkDebugSupport.cpp" 
-    
-    "src/core/engine/AhTomPhysicalDevice.h" "src/core/engine/AhTomPhysicalDevice.cpp" 
-    "src/core/engine/AhTomLogicalDevice.h" "src/core/engine/AhTomLogicalDevice.cpp" "src/core/engine/AhTomWindowSurface.h" "src/core/engine/AhTomWindowSurface.cpp" "src/core/engine/AhTomDefines.h" "src/core/engine/AhTomSwapChain.h" "src/core/engine/AhTomSwapChain.cpp")
+        "src/core/AhTomEngine.h"
+        "src/core/AhTomEngine.cpp"
+        "src/types/AhTomTypes.h"
+
+        "src/core/vulkan/VkValidationLayerSupport.h"
+        "src/core/vulkan/VKExtensionSupport.h"
+        "src/core/vulkan/VkDebugSupport.h" "src/core/vulkan/VkDebugSupport.cpp"
+
+        "src/core/utils/FileUtils.h"
+
+        "src/core/engine/AhTomPhysicalDevice.h" "src/core/engine/AhTomPhysicalDevice.cpp"
+        "src/core/engine/AhTomLogicalDevice.h" "src/core/engine/AhTomLogicalDevice.cpp"
+        "src/core/engine/AhTomWindowSurface.h" "src/core/engine/AhTomWindowSurface.cpp"
+        "src/core/engine/AhTomDefines.h"
+        "src/core/engine/AhTomSwapChain.h" "src/core/engine/AhTomSwapChain.cpp"
+        "src/core/engine/AhTomGraphicsPipeline.h" "src/core/engine/AhTomGraphicsPipeline.cpp"
+)
 
 # Include paths
 target_include_directories(${PROJECT_NAME} PRIVATE
