@@ -164,4 +164,13 @@ void Core::Engine::AhTomSwapChain::createSwapChainImagesViews(AhTomSwapChainRequ
     }
 }
 
+VkExtent2D Core::Engine::AhTomSwapChain::getSwapChainExtent() const
+{
+    return mSwapChainExtent;
+}
+
+VkFormat Core::Engine::AhTomSwapChain::getSwapChainImageFormat() const {
+    return mSwapChainImageFormat;
+}
+
 

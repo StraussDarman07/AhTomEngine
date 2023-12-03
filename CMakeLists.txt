@@ -18,8 +18,9 @@ add_executable(${PROJECT_NAME} "main.cpp"
         "src/types/AhTomTypes.h"
 
         "src/core/vulkan/VkValidationLayerSupport.h"
-        "src/core/vulkan/VKExtensionSupport.h"
+        "src/core/vulkan/VkExtensionSupport.h"
         "src/core/vulkan/VkDebugSupport.h" "src/core/vulkan/VkDebugSupport.cpp"
+        "src/core/vulkan/VkShaderSupport.h"
 
         "src/core/utils/FileUtils.h"
 
@@ -29,6 +30,7 @@ add_executable(${PROJECT_NAME} "main.cpp"
         "src/core/engine/AhTomDefines.h"
         "src/core/engine/AhTomSwapChain.h" "src/core/engine/AhTomSwapChain.cpp"
         "src/core/engine/AhTomGraphicsPipeline.h" "src/core/engine/AhTomGraphicsPipeline.cpp"
+
 )
 
 # Include paths

@@ -4,13 +4,29 @@
 
 #pragma once
 
+#include "AhTomLogicalDevice.h"
+#include "AhTomSwapChain.h"
+
 namespace Core::Engine {
 
-    class AhTomGraphicsPipeline {
+    struct AhTomGraphicsPipelineRequirements
+    {
+        const AhTomLogicalDevice& logicalDevice;
+        const AhTomSwapChain& swapChain;
+    };
 
-        explicit AhTomGraphicsPipeline();
+    class AhTomGraphicsPipeline {
+    public:
+        explicit AhTomGraphicsPipeline(AhTomGraphicsPipelineRequirements requirements);
+
+        void destroy(const AhTomLogicalDevice& logicalDevice);
 
     private:
-        void createGraphicsPipeline();
+        void createRenderPass(AhTomGraphicsPipelineRequirements requirements);
+        void createGraphicsPipeline(AhTomGraphicsPipelineRequirements requirements);
+
+        VkRenderPass mRenderPass;
+        VkPipeline mGraphicsPipeline;
+        VkPipelineLayout mPipelineLayout;
     };
 }

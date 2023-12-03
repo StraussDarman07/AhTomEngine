@@ -31,6 +31,9 @@ namespace Core::Engine
 
 		VkSwapchainKHR getSwapChain();
 
+        [[nodiscard]] VkExtent2D getSwapChainExtent() const;
+        [[nodiscard]] VkFormat getSwapChainImageFormat() const;
+
 	private:
 		void createSwapChain(AhTomSwapChainRequirements requirements);
         void createSwapChainImagesViews(AhTomSwapChainRequirements requirements);

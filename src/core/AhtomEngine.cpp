@@ -4,9 +4,10 @@
 #include "engine/AhTomLogicalDevice.h"
 #include "engine/AhTomWindowSurface.h"
 #include "engine/AhTomSwapChain.h"
+#include "engine/AhTomGraphicsPipeline.h"
 
 #include "vulkan/VkValidationLayerSupport.h"
-#include "vulkan/VKExtensionSupport.h"
+#include "vulkan/VkExtensionSupport.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -27,6 +28,7 @@ Core::AhTomEngine::AhTomEngine(int major, int minor, int patch) :
 	mWindowSurface(nullptr),
 	mLogicalDevice(nullptr),
 	mSwapChain(nullptr),
+    mGraphicsPipeline(nullptr),
 	mDebugger(Vulkan::VkDebugger{}),
 	mInstance(VK_NULL_HANDLE),
 	mVersion(Types::Version{major, minor, patch})
@@ -64,6 +66,8 @@ void Core::AhTomEngine::initVulkan()
 	mLogicalDevice = std::make_unique<Engine::AhTomLogicalDevice>(*mPhysicalDevice);
 
 	mSwapChain = std::make_unique<Engine::AhTomSwapChain>(Engine::AhTomSwapChainRequirements{*mPhysicalDevice, *mWindowSurface, *mLogicalDevice, mWindow});
+
+    mGraphicsPipeline = std::make_unique<Engine::AhTomGraphicsPipeline>(Engine::AhTomGraphicsPipelineRequirements{*mLogicalDevice, *mSwapChain});
 }
 
 void Core::AhTomEngine::mainLoop()
@@ -76,6 +80,8 @@ void Core::AhTomEngine::mainLoop()
 
 void Core::AhTomEngine::cleanup()
 {
+    mGraphicsPipeline->destroy(*mLogicalDevice);
+
 	mSwapChain->destroy(*mLogicalDevice);
 
 	mLogicalDevice->destroy();
