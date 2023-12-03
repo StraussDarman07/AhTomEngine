@@ -73,7 +73,7 @@ void Core::Engine::AhTomSwapChain::createSwapChain(AhTomSwapChainRequirements re
 
 	vkGetSwapchainImagesKHR(requirements.logicalDevice.getDevice(), mSwapChain, &imageCount, nullptr);
 	mSwapChainImages.resize(imageCount);
-	vkGetSwapchainImagesKHR(requirements.logicalDevice.getDevice(), mSwapChain, &imageCount, swapChainImages.data());
+	vkGetSwapchainImagesKHR(requirements.logicalDevice.getDevice(), mSwapChain, &imageCount, mSwapChainImages.data());
 
 	mSwapChainImageFormat = surfaceFormat.format;
 	mSwapChainExtent = extent;

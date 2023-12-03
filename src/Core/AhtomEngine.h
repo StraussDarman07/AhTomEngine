@@ -3,6 +3,8 @@
 #include "types/AhTomTypes.h"
 #include "vulkan/VkDebugSupport.h"
 
+#include <memory>
+
 #include <vulkan/vulkan.h>
 
 struct GLFWwindow;

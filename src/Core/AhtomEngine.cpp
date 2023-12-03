@@ -13,8 +13,6 @@
 
 #include <iostream>
 #include <stdexcept>
-#include <cstdlib>
-#include <vector>
 
 constexpr uint32_t WIDTH = 800;
 constexpr uint32_t HEIGHT = 600;
@@ -61,11 +59,11 @@ void Core::AhTomEngine::initVulkan()
 
 	mWindowSurface = std::make_unique <Engine::AhTomWindowSurface>(mInstance, mWindow);
 
-	mPhysicalDevice = std::make_unique<Engine::AhTomPhysicalDevice>(mInstance, *mWindowSurface.get());
+	mPhysicalDevice = std::make_unique<Engine::AhTomPhysicalDevice>(mInstance, *mWindowSurface);
 
-	mLogicalDevice = std::make_unique<Engine::AhTomLogicalDevice>(*mPhysicalDevice.get());
+	mLogicalDevice = std::make_unique<Engine::AhTomLogicalDevice>(*mPhysicalDevice);
 
-	mSwapChain = std::make_unique<Engine::AhTomSwapChain>(Engine::AhTomSwapChainRequirements{*mPhysicalDevice.get(), * mWindowSurface.get(), * mLogicalDevice.get(), mWindow});
+	mSwapChain = std::make_unique<Engine::AhTomSwapChain>(Engine::AhTomSwapChainRequirements{*mPhysicalDevice, *mWindowSurface, *mLogicalDevice, mWindow});
 }
 
 void Core::AhTomEngine::mainLoop()
@@ -78,7 +76,7 @@ void Core::AhTomEngine::mainLoop()
 
 void Core::AhTomEngine::cleanup()
 {
-	mSwapChain->destroy(*mLogicalDevice.get());
+	mSwapChain->destroy(*mLogicalDevice);
 
 	mLogicalDevice->destroy();
 

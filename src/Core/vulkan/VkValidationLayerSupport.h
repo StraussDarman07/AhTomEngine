@@ -4,6 +4,7 @@
 
 #include <array>
 #include <vector>
+#include <cstring>
 
 namespace Core::Vulkan
 {
@@ -29,7 +30,7 @@ namespace Core::Vulkan
 
 			for (const auto& layerProperties : availableLayers)
 			{
-				if (strcmp(layerName, layerProperties.layerName) == 0)
+				if (std::strcmp(layerName, layerProperties.layerName) == 0)
 				{
 					layerFound = true;
 					break;
